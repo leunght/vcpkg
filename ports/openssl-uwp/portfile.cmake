@@ -1,11 +1,3 @@
-# Common Ambient Variables:
-#   VCPKG_ROOT_DIR = <C:\path\to\current\vcpkg>
-#   TARGET_TRIPLET is the current triplet (x86-windows, etc)
-#   PORT is the current port name (zlib, etc)
-#   CURRENT_BUILDTREES_DIR = ${VCPKG_ROOT_DIR}\buildtrees\${PORT}
-#   CURRENT_PACKAGES_DIR  = ${VCPKG_ROOT_DIR}\packages\${PORT}_${TARGET_TRIPLET}
-#
-
 if (VCPKG_LIBRARY_LINKAGE STREQUAL static)
     set(VCPKG_LIBRARY_LINKAGE dynamic)
     message("Static building not supported yet")
@@ -27,26 +19,31 @@ endif()
 
 include(vcpkg_common_functions)
 
-set(SOURCE_PATH ${CURRENT_BUILDTREES_DIR}/src/openssl-OpenSSL_1_0_2l_WinRT)
-
 vcpkg_find_acquire_program(PERL)
 vcpkg_find_acquire_program(JOM)
 get_filename_component(JOM_EXE_PATH ${JOM} DIRECTORY)
 get_filename_component(PERL_EXE_PATH ${PERL} DIRECTORY)
 set(ENV{PATH} "$ENV{PATH};${PERL_EXE_PATH};${JOM_EXE_PATH}")
 
-vcpkg_download_distfile(ARCHIVE
-    URLS "https://github.com/Microsoft/openssl/archive/OpenSSL_1_0_2l_WinRT.zip"
-    FILENAME "openssl-microsoft-1.0.2l_WinRT.zip"
-    SHA512 238b3daad7f1a2486e09d47e6d1bd4b0aa8e8a896358c6dfe11a77c2654da1b29d3c7612f9d200d5be5a020f33d96fe39cd75b99aa35aa4129feb756f7f98ee8
+vcpkg_from_github(
+    OUT_SOURCE_PATH MASTER_SOURCE_PATH
+    REPO Microsoft/openssl
+    REF OpenSSL_1_0_2l_WinRT
+    SHA512 aa3eafbff72a246ac45af059d549450e8589cb594fd8a714e92dc0390f9874b0e9510d4878fe38792733f80acc05f9a550f549c399990b769715c42949d2f4bf
+    HEAD_REF OpenSSL_1_0_2_WinRT-stable
+    PATCHES
+        ${CMAKE_CURRENT_LIST_DIR}/fix-uwp-rs4.patch
+        ${CMAKE_CURRENT_LIST_DIR}/ConfigureIncludeQuotesFix.patch
+        ${CMAKE_CURRENT_LIST_DIR}/STRINGIFYPatch.patch
+        ${CMAKE_CURRENT_LIST_DIR}/EmbedSymbolsInStaticLibsZ7.patch
 )
 
-vcpkg_extract_source_archive(${ARCHIVE})
+set(SOURCE_PATH_BASE ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel)
+file(REMOVE_RECURSE ${SOURCE_PATH})
 
-vcpkg_apply_patches(
-    SOURCE_PATH ${SOURCE_PATH}
-    PATCHES ${CMAKE_CURRENT_LIST_DIR}/fix-uwp-rs4.patch
-)
+file(COPY ${MASTER_SOURCE_PATH} DESTINATION ${SOURCE_PATH_BASE})
+get_filename_component(MASTER_SOURCE_PATH_NAME "${MASTER_SOURCE_PATH}" NAME)
+set(SOURCE_PATH ${SOURCE_PATH_BASE}/${MASTER_SOURCE_PATH_NAME})
 
 file(REMOVE_RECURSE ${SOURCE_PATH}/tmp32dll)
 file(REMOVE_RECURSE ${SOURCE_PATH}/out32dll)
@@ -94,6 +91,6 @@ file(INSTALL
     ${SOURCE_PATH}/out32dll/ssleay32.lib
     DESTINATION ${CURRENT_PACKAGES_DIR}/debug/lib)
 
-file(INSTALL ${SOURCE_PATH}/LICENSE DESTINATION ${CURRENT_PACKAGES_DIR}/share/openssl RENAME copyright)
+file(INSTALL ${SOURCE_PATH}/LICENSE DESTINATION ${CURRENT_PACKAGES_DIR}/share/openssl-uwp RENAME copyright)
 
 file(COPY ${CMAKE_CURRENT_LIST_DIR}/usage DESTINATION ${CURRENT_PACKAGES_DIR}/share/${PORT})
