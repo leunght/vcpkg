@@ -24,8 +24,8 @@ endif()
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO xianyi/OpenBLAS
-    REF v0.2.20
-    SHA512 8dfc8e8c8d456b834d2e9544c8eadd9f4770e30db8b8dd76af601ec0735fd86c9cf63dd6a03ccd23fc02ec2e05069a09875b9073dfe29f99aadab3a958ae2634
+    REF v0.3.0
+    SHA512 6a982d2adc13febc162d5c0077cedc116c771409ee1dbb651da6a073e5f6a439e1d0eba0349b3b2e506b274d3014adbf48fc96625ed942a61a54a0c936576b89
     HEAD_REF develop
 )
 

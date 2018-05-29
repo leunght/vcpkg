@@ -3,8 +3,8 @@ include(vcpkg_common_functions)
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO OpenImageIO/oiio
-    REF Release-1.9.2dev
-    SHA512 11293f09189f26a68e2e899e15081644c17f6ad1be070d090d9df133b98f7f30a09344a2b599c8b82dc8daba64847a9dfa278f9857bc110e975e9e06c3a2fa6f
+    REF Release-1.9.3dev
+    SHA512 c218f524cd4242d33400f4df8fc6acd66d0ceba12640fb2b3870c7d774a9e991ce59b13a7a96878aaf82ab44059bd8a40b286d812e2c2a8b6a090d68196f4190
     HEAD_REF master
 )
 
